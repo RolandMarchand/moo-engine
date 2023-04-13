@@ -12,6 +12,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 include_directories(
+  "${CMAKE_SOURCE_DIR}/modules"
   "${CMAKE_SOURCE_DIR}/src"
   "${PROJECT_BINARY_DIR}/src"
 )
@@ -21,5 +22,6 @@ configure_file(
     "${PROJECT_BINARY_DIR}/src/config.h"
 )
 
+enable_testing()
 add_subdirectory(src)
 add_subdirectory(test EXCLUDE_FROM_ALL)

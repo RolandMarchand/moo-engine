@@ -1,9 +1,6 @@
 #include <SDL2/SDL.h>
-#include <SDL_pixels.h>
-#include <SDL_video.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdbool.h>
+
+#include "common.h"
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -12,32 +9,14 @@
 #define TILE_SIZE 64
 #define FORMAT SDL_PIXELFORMAT_RGB888
 
-enum Error {
-	OK = 0,
-	ERROR
-};
-
-void animate_rainbow(Uint32 *pixels);
-
-int world_map[MAP_WIDTH][MAP_HEIGHT] = {
-	{1,1,1,1,1,1,1,1,1,1},
-	{1,0,0,0,0,0,0,0,0,1},
-	{1,0,2,0,0,0,0,2,0,1},
-	{1,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,3,3,0,0,0,1},
-	{1,0,0,0,3,3,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,1},
-	{1,0,2,0,0,0,0,2,0,1},
-	{1,0,0,0,0,0,0,0,0,1},
-	{1,1,1,1,1,1,1,1,1,1},
-};
-
 struct {
 	SDL_Window *window;
 	SDL_Surface *backbuffer;
-	Uint32 *pixels;
 	Uint64 tick;
 } context;
+
+void animate_rainbow(Uint32 *pixels);
+void draw_view(Uint32 *pixels, int x, int y, double angle);
 
 int engine_init()
 {
@@ -59,7 +38,6 @@ int engine_init()
 						 SCREEN_HEIGHT,
 						 32,
 						 FORMAT);
-	context.pixels = context.backbuffer->pixels;
 	if (!context.window) {
 		printf("Window could not be created! SDL_Error: %s\n",
 		       SDL_GetError());
@@ -83,7 +61,8 @@ void engine_quit()
 void engine_render()
 {
 	SDL_LockSurface(context.backbuffer);
-	animate_rainbow(context.pixels);
+	/* draw_view(context.backbuffer->pixels, 5 * TILE_SIZE, 2 * TILE_SIZE, 0); */
+	/* animate_rainbow(context.backbuffer->pixels); */
 	SDL_UnlockSurface(context.backbuffer);
 	SDL_BlitSurface(context.backbuffer, NULL,
 			SDL_GetWindowSurface(context.window), NULL);
@@ -100,41 +79,55 @@ int main(void)
 	engine_quit();
 }
 
+void draw_view(Uint32 *pixels, int x, int y, double angle)
+{
+	SDL_Rect bg = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+	Uint32 bg_color = SDL_MapRGB(context.backbuffer->format, 100, 100, 100);
+	SDL_FillRect(context.backbuffer, &bg, bg_color);
+
+	double fov = 90.0;
+	double slice = fov / SCREEN_WIDTH;
+	angle = angle - (fov / 2.0);
+	for (int col = 0; col < SCREEN_WIDTH; col++) {
+		
+	}
+}
+
 void animate_rainbow(Uint32 *pixels)
 {
-#define ANIMATION_SPEED -0.003f
+#define ANIMATION_SPEED 0.003
 	for (int h = 0; h < SCREEN_HEIGHT; h++) {
 		for (int w = 0; w < SCREEN_WIDTH; w++) {
 			int index = h * SCREEN_WIDTH + w;
-			float t = w * 1.0f / SCREEN_WIDTH;
+			double t = w * 1.0 / SCREEN_WIDTH;
 			t += context.tick * ANIMATION_SPEED;
-			t = fmod(fabs(t), 1.0f);
-			float hue = 360.0f * t;
-			float x = 1.0f - fabs(fmod((hue/60.0f), 2.0f) - 1.0f);
-			float r1, g1, b1;
-			if (hue < 60.0f) {
-				r1 = 1.0f;
+			t = fmod(fabs(t), 1.0);
+			double hue = 360.0 * t;
+			double x = 1.0 - fabs(fmod((hue/60.0), 2.0) - 1.0);
+			double r1, g1, b1;
+			if (hue < 60.0) {
+				r1 = 1.0;
 				g1 = x;
-				b1 = 0.0f;
-			} else if (hue < 120.0f) {
+				b1 = 0.0;
+			} else if (hue < 120.0) {
 				r1 = x;
-				g1 = 1.0f;
-				b1 = 0.0f;
-			} else if (hue < 180.0f) {
-				r1 = 0.0f;
-				g1 = 1.0f;
+				g1 = 1.0;
+				b1 = 0.0;
+			} else if (hue < 180.0) {
+				r1 = 0.0;
+				g1 = 1.0;
 				b1 = x;
-			} else if (hue < 240.0f) {
-				r1 = 0.0f;
+			} else if (hue < 240.0) {
+				r1 = 0.0;
 				g1 = x;
-				b1 = 1.0f;
-			} else if (hue < 300.0f) {
+				b1 = 1.0;
+			} else if (hue < 300.0) {
 				r1 = x;
-				g1 = 0.0f;
-				b1 = 1.0f;
+				g1 = 0.0;
+				b1 = 1.0;
 			} else {
-				r1 = 1.0f;
-				g1 = 0.0f;
+				r1 = 1.0;
+				g1 = 0.0;
 				b1 = x;
 			}
 			pixels[index] = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), (Uint8)(r1 * 255), (Uint8)(g1 * 255), (Uint8)(b1 * 255));
