@@ -2,6 +2,8 @@
 
 #include "common.h"
 
+#define PI 3.141592654
+#define FOV 75
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define MAP_WIDTH 10
@@ -16,7 +18,7 @@ struct {
 } context;
 
 void animate_rainbow(Uint32 *pixels);
-void draw_view(Uint32 *pixels, int x, int y, double angle);
+void draw_view(int x, int y, double angle);
 
 int engine_init()
 {
@@ -79,7 +81,13 @@ int main(void)
 	engine_quit();
 }
 
-void draw_view(Uint32 *pixels, int x, int y, double angle)
+int screen_angle_to_x(double a)
+{
+	double a_pi4 = (FOV / 2.0 + a) / FOV * PI * 2.0 + (PI * 4.0);
+	return SCREEN_WIDTH / 2.0 * (1.0 - tan(a_pi4));
+}
+
+void draw_view(int x, int y, double angle)
 {
 	SDL_Rect bg = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	Uint32 bg_color = SDL_MapRGB(context.backbuffer->format, 100, 100, 100);
