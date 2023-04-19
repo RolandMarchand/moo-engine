@@ -2,14 +2,25 @@
 
 #include "common.h"
 
-typedef struct {
+#define INVALID_SECTOR (sector_idx_t)(-1)
+
+typedef size_t wall_idx_t;
+typedef size_t sector_idx_t;
+
+struct wall {
 	line line;
-	int portal;
-} wall;
+	sector_idx_t next_sector;
+};
 
-typedef struct {
-	int wall_start;
-	int wall_count;
-} sector;
+struct sector {
+	wall_idx_t wall_start;
+	size_t wall_count;
+};
 
-bool inside(wall *walls, sector s, vector point);
+void update_sector(vector updated_pos);
+bool inside(sector_idx_t idx, vector point);
+void terminate_level();
+void initialize_level(
+	struct wall *p_walls, struct sector *p_sectors,
+	size_t wall_cnt, size_t sector_cnt
+	);
