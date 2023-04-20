@@ -67,4 +67,5 @@ double vector_dot(vector, vector);
 double vector_cross(vector, vector);
 double vector_magnitude(vector);
 double vector_projection(line, vector point);
-vector vector_rotate(vector, double angle);
+vector vector_rotate(vector, double angle_rad);
+vector vector_rotate_degrees(vector, double angle_deg);

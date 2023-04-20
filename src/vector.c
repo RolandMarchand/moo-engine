@@ -65,8 +65,14 @@ double vector_projection(line l, vector p)
 	return vector_cross(v1, v2);
 }
 
-vector vector_rotate(vector v, double angle)
+vector vector_rotate(vector v, double angle_rad)
 {
-	return Vector(v.x * cos(angle) - v.y * sin(angle),
-		      v.x * sin(angle) + v.y * cos(angle));
+	return Vector(v.x * cos(angle_rad) - v.y * sin(angle_rad),
+		      v.x * sin(angle_rad) + v.y * cos(angle_rad));
+}
+
+vector vector_rotate_degrees(vector v, double angle_deg)
+{
+    double angle_rad = angle_deg * M_PI / 180.0;
+    return vector_rotate(v, angle_rad);
 }
