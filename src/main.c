@@ -1,21 +1,39 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
-#include "common.h"
+#include "signal.h"
 
 #include "common.h"
 #include "u_math.h"
+#include "draw.h"
 
 struct {
 	SDL_Window *window;
-	SDL_Surface *backbuffer;
-	Uint64 tick;
+	SDL_Surface *render;
+	TTF_Font *font;
+	SDL_Event event;
+
+	Uint64 frame;
+	double delta;
+
+	Uint64 fps;
+	bool show_fps;
 } context;
+
+
+int engine_init(void);
+void engine_quit();
+void engine_input(void);
+void engine_update(void);
+void engine_render(void);
 
 void animate_rainbow(Uint32 *pixels);
 void draw_view(int x, int y, double angle);
 
-int engine_init()
+int engine_init(void)
 {
+	signal(SIGINT, engine_quit);
+
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("SDL could not initialize! SDL_Error: %s\n",
 		       SDL_GetError());
@@ -28,7 +46,7 @@ int engine_init()
 				   SDL_WINDOWPOS_UNDEFINED,
 				   SCREEN_WIDTH, SCREEN_HEIGHT,
 				   SDL_WINDOW_SHOWN);
-	context.backbuffer
+	context.render
 		= SDL_CreateRGBSurfaceWithFormat(0,
 						 SCREEN_WIDTH,
 						 SCREEN_HEIGHT,
@@ -39,37 +57,99 @@ int engine_init()
 		       SDL_GetError());
 		return ERROR;
 	}
-	if (!context.backbuffer) {
-		printf("Backbuffer could not be created! SDL_Error: %s\n",
+	if (!context.render) {
+		printf("Render surface could not be created! SDL_Error: %s\n",
 		       SDL_GetError());
 		return ERROR;
 	}
+
+	TTF_Init();
+	context.font = TTF_OpenFont("../res/font.ttf", 24);
+	if (!context.font) {
+		fprintf(stderr, "Error: font cannot be loaded\n");
+		exit(EXIT_FAILURE);
+	}
+
 	return OK;
+}
+
+void engine_update(void)
+{
+	context.frame++;
+
+	/* delta */
+	static Uint64 previous_time = 0;
+	Uint64 current_time = SDL_GetTicks64();
+	context.delta = (current_time - previous_time) / 1000.0;
+	previous_time = current_time;
+
+	static double second = 0;
+	static Uint64 previous_frame_cnt = 0;
+	second += context.delta;
+	if (second > 1) {
+		context.fps = context.frame - previous_frame_cnt;
+		previous_frame_cnt = context.frame;
+		second = 0;
+	}
+}
+
+void engine_input()
+{
+	SDL_PollEvent(&context.event);
+	switch (context.event.type) {
+	case SDL_KEYDOWN:
+		if (context.event.key.repeat == 1) {
+			break;
+		}
+		if (context.event.key.keysym.sym == SDLK_F1
+		    && SDL_GetModState() & KMOD_LALT) {
+			context.show_fps = !context.show_fps;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 void engine_quit()
 {
-	SDL_FreeSurface(context.backbuffer);
+	SDL_FreeSurface(context.render);
 	SDL_DestroyWindow(context.window);
+	TTF_CloseFont(context.font);
+	TTF_Quit();
 	SDL_Quit();
+	exit(EXIT_SUCCESS);
 }
 
-void engine_render()
+void engine_render(void)
 {
-	SDL_LockSurface(context.backbuffer);
-	/* draw_view(context.backbuffer->pixels, 5 * TILE_SIZE, 2 * TILE_SIZE, 0); */
-	/* animate_rainbow(context.backbuffer->pixels); */
-	SDL_UnlockSurface(context.backbuffer);
-	SDL_BlitSurface(context.backbuffer, NULL,
+	SDL_LockSurface(context.render);
+	/* draw_rect(context.render->pixels, Vector(-300, -300), Vector(300, 300), Color(255, 0, 0)); */
+	/* draw_view(0, 0, FOV); */
+	animate_rainbow(context.render->pixels);
+	SDL_UnlockSurface(context.render);
+	SDL_BlitSurface(context.render, NULL,
 			SDL_GetWindowSurface(context.window), NULL);
+
+	if (context.show_fps) {
+		static char fps[8];
+		static SDL_Surface *ui;
+		sprintf(fps, "%lu", context.fps);
+		ui = TTF_RenderUTF8_Solid(context.font, fps, (SDL_Color){0, 0, 0, 255});
+		SDL_BlitSurface(ui, NULL,
+				SDL_GetWindowSurface(context.window), NULL);
+		SDL_FreeSurface(ui);
+	}
+
 	SDL_UpdateWindowSurface(context.window);
 }
 
 int main(void)
 {
 	engine_init();
-	for (SDL_Event event; event.type != SDL_QUIT; SDL_PollEvent(&event)) {
-		context.tick++;
+	while (context.event.type != SDL_QUIT) {
+		engine_input();
+		engine_update();
 		engine_render();
 	}
 	engine_quit();
@@ -84,15 +164,13 @@ int screen_angle_to_x(double a)
 void draw_view(int x, int y, double angle)
 {
 	SDL_Rect bg = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-	Uint32 bg_color = SDL_MapRGB(context.backbuffer->format, 100, 100, 100);
-	SDL_FillRect(context.backbuffer, &bg, bg_color);
+	Uint32 bg_color = SDL_MapRGB(context.render->format, 100, 100, 100);
+	SDL_FillRect(context.render, &bg, bg_color);
 
-	double fov = 90.0;
-	double slice = fov / SCREEN_WIDTH;
-	angle = angle - (fov / 2.0);
-	for (int col = 0; col < SCREEN_WIDTH; col++) {
-		
-	}
+	vector pos = Vector(100, 100);
+	vector dir = VECTOR_UP;
+	vector plane = vector_rotate_degrees(dir, -90);
+
 }
 
 void animate_rainbow(Uint32 *pixels)
@@ -102,7 +180,7 @@ void animate_rainbow(Uint32 *pixels)
 		for (int w = 0; w < SCREEN_WIDTH; w++) {
 			int index = h * SCREEN_WIDTH + w;
 			double t = w * 1.0 / SCREEN_WIDTH;
-			t += context.tick * ANIMATION_SPEED;
+			t += context.frame * ANIMATION_SPEED;
 			t = fmod(fabs(t), 1.0);
 			double hue = 360.0 * t;
 			double x = 1.0 - fabs(fmod((hue/60.0), 2.0) - 1.0);
@@ -132,7 +210,8 @@ void animate_rainbow(Uint32 *pixels)
 				g1 = 0.0;
 				b1 = x;
 			}
-			pixels[index] = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), (Uint8)(r1 * 255), (Uint8)(g1 * 255), (Uint8)(b1 * 255));
+			struct color c = Color(r1 * 255, g1 * 255, b1 * 255);
+			draw_pixel(pixels, index, c);
 		} 
 	}
 #undef ANIMATION_SPEED
