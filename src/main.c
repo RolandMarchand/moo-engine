@@ -2,14 +2,8 @@
 
 #include "common.h"
 
-#define PI 3.141592654
-#define FOV 75
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-#define MAP_WIDTH 10
-#define MAP_HEIGHT 10
-#define TILE_SIZE 64
-#define FORMAT SDL_PIXELFORMAT_RGB888
+#include "common.h"
+#include "u_math.h"
 
 struct {
 	SDL_Window *window;

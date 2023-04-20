@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "u_math.h"
 
 #define INVALID_SECTOR (sector_idx_t)(-1)
 
