@@ -10,6 +10,12 @@
 #define VectorIsValid(v) !VectorCompare(v, VECTOR_INVALID)
 #define LineIsValid(l) (VectorIsValid(l.x) && VectorIsValid(l.y))
 
+#define VECTOR_ZERO Vector(0, 0)
+#define VECTOR_UP Vector(0, 1)
+#define VECTOR_DOWN Vector(0, -1)
+#define VECTOR_LEFT Vector(-1, 0)
+#define VECTOR_RIGHT Vector(1, 0)
+
 typedef struct {
 	union {
 		struct {
