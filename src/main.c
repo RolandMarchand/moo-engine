@@ -1,8 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "signal.h"
-
 #include "common.h"
 #include "u_math.h"
 #include "draw.h"
@@ -32,8 +30,6 @@ void draw_view(int x, int y, double angle);
 
 int engine_init(void)
 {
-	signal(SIGINT, engine_quit);
-
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("SDL could not initialize! SDL_Error: %s\n",
 		       SDL_GetError());
