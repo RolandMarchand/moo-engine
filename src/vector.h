@@ -3,12 +3,13 @@
 #include "common.h"
 
 #define VECTOR_INVALID Vector(NAN, NAN)
-#define Vector(x, y) (vector){.w = x, .h = y}
-#define Line(a, b) (line){.p1 = a, .p2 = b}
-#define VectorCompare(v1, v2) (memcmp(&v1, &v2, sizeof(vector)) == 0)
-#define LineCompare(l1, l2) (memcmp(&l1, &l2, sizeof(line)) == 0)
-#define VectorIsValid(v) !VectorCompare(v, VECTOR_INVALID)
-#define LineIsValid(l) (VectorIsValid(l.x) && VectorIsValid(l.y))
+#define Vector(_x, _y) (vector){.w = (_x), .h = (_y)}
+#define Line(_ax, _ay, _bx, _by) (line){.p1 = Vector((_ax), (_ay)), .p2 = Vector((_bx), (_by))}
+#define Linev(_a, _b) (line){.p1 = (_a), .p2 = (_b)}
+#define VectorCompare(_v1, _v2) (memcmp(&(_v1), &(_v2), sizeof(vector)) == 0)
+#define LineCompare(_l1, _l2) (memcmp(&(_l1), &(_l2), sizeof(line)) == 0)
+#define VectorIsValid(_v) !VectorCompare((_v), VECTOR_INVALID)
+#define LineIsValid(_l) (VectorIsValid((_l).x) && VectorIsValid((_l).y))
 
 #define VECTOR_ZERO Vector(0, 0)
 #define VECTOR_UP Vector(0, 1)
