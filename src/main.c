@@ -175,12 +175,14 @@ void draw_view(int x, int y, double angle)
 
 void animate_rainbow(Uint32 *pixels)
 {
-#define ANIMATION_SPEED 0.003
+#define ANIMATION_SPEED 0.1
+	static double forward = 0;
+	forward += context.delta * ANIMATION_SPEED;
+	forward = fmod(forward, 1.0);
 	for (int h = 0; h < SCREEN_HEIGHT; h++) {
 		for (int w = 0; w < SCREEN_WIDTH; w++) {
-			int index = h * SCREEN_WIDTH + w;
 			double t = w * 1.0 / SCREEN_WIDTH;
-			t += context.frame * ANIMATION_SPEED;
+			t += forward;
 			t = fmod(fabs(t), 1.0);
 			double hue = 360.0 * t;
 			double x = 1.0 - fabs(fmod((hue/60.0), 2.0) - 1.0);
@@ -210,8 +212,8 @@ void animate_rainbow(Uint32 *pixels)
 				g1 = 0.0;
 				b1 = x;
 			}
-			struct color c = Color(r1 * 255, g1 * 255, b1 * 255);
-			draw_pixel(pixels, index, c);
+			SDL_Color c = {r1 * 255, g1 * 255, b1 * 255, 255};
+			draw_pixel(pixels, w, h, c);
 		} 
 	}
 #undef ANIMATION_SPEED
