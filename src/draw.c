@@ -1,13 +1,107 @@
 #include "draw.h"
-#include <SDL2/SDL.h>
 
-void draw_pixel(Uint32 *pixels, size_t index, struct color c)
+static void draw_top_triangle(Uint32 *pixels, vector v1, vector v2, vector v3, SDL_Color color);
+static void draw_bottom_triangle(Uint32 *pixels, vector v1, vector v2, vector v3, SDL_Color color);
+
+void draw_line(Uint32 *pixels, line _line, SDL_Color color) {
+	// check if line is at all on screen
+	line cline;
+	cline.a.x = clamp(_line.a.x, 0, SCREEN_WIDTH);
+	cline.a.y = clamp(_line.a.y, 0, SCREEN_HEIGHT);
+	cline.b.x = clamp(_line.b.x, 0, SCREEN_WIDTH);
+	cline.b.y = clamp(_line.b.y, 0, SCREEN_HEIGHT);
+
+	if (cline.a.x > cline.b.x) { swap(cline.a.x, cline.b.x); }
+	if (cline.a.y > cline.b.y) { swap(cline.a.y, cline.b.y); }
+
+	if (cline.a.x >= SCREEN_WIDTH
+	    || cline.a.y >= SCREEN_HEIGHT
+	    || cline.b.x < 0
+	    || cline.b.y < 0) {
+		return;
+	}
+
+	/* use DDA algorithm to draw line */
+	double dx = _line.b.x - _line.a.x;
+	double dy = _line.b.y - _line.a.y;
+
+	double step = fabs(dx) > fabs(dy) ? fabs(dx) : fabs(dy);
+
+	dx /= step;
+	dy /= step;
+
+	double x = _line.a.x, y = _line.a.y;
+	for (int i = 0; i <= step; i++) {
+		draw_pixel(pixels, x, y, color);
+		x += dx;
+		y += dy;
+	}
+}
+
+void draw_top_triangle(Uint32 *pixels, vector v1, vector v2, vector v3, SDL_Color color)
 {
-	pixels[index] = SDL_MapRGB(
+	double invslope1 = (v3.x - v1.x) / (v3.y - v1.y);
+	double invslope2 = (v3.x - v2.x) / (v3.y - v2.y);
+
+	double curx1 = v3.x;
+	double curx2 = v3.x;
+
+	for (int scanline_y = v3.y; scanline_y > v1.y; scanline_y--) {
+		draw_line(pixels, Line(curx1, scanline_y, curx2, scanline_y), color);
+		curx1 -= invslope1;
+		curx2 -= invslope2;
+	}
+}
+
+void draw_bottom_triangle(Uint32 *pixels, vector v1, vector v2, vector v3, SDL_Color color)
+{
+	double invslope1 = (v2.x - v1.x) / (v2.y - v1.y);
+	double invslope2 = (v3.x - v1.x) / (v3.y - v1.y);
+
+	double curx1 = v1.x;
+	double curx2 = v1.x;
+
+	for (int scanline_y = v1.y; scanline_y <= v2.y; scanline_y++) {
+		draw_line(pixels, Line(curx1, scanline_y, curx2, scanline_y), color);
+		curx1 += invslope1;
+		curx2 += invslope2;
+	}
+}
+
+void draw_triangle(Uint32 *pixels, vector v1, vector v2, vector v3, SDL_Color color)
+{
+	if (v1.y > v2.y) {
+		swap(v1, v2);
+	}
+	if (v2.y > v3.y) {
+		swap(v2, v3);
+	}
+	if (v1.y > v3.y) {
+		swap(v1, v3);
+	}
+
+	if (v2.y == v3.y) {
+		draw_bottom_triangle(pixels, v1, v2, v3, color);
+	}
+	else if (v1.y == v2.y) {
+		draw_top_triangle(pixels, v1, v2, v3, color);
+	} else {
+		vector v4 = Vector(v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x), v2.y);
+		draw_bottom_triangle(pixels, v1, v2, v4, color);
+		draw_top_triangle(pixels, v2, v4, v3, color);
+	}
+}
+
+void draw_pixel(Uint32 *pixels, int pixel_x, int pixel_y, SDL_Color c)
+{
+	if (pixel_x < 0 || pixel_y < 0) {
+		return;
+	}
+	pixels[pixel_y * SCREEN_WIDTH + pixel_x] = SDL_MapRGB(
 		SDL_AllocFormat(FORMAT), c.r, c.g, c.b);
 }
 
-void draw_rect(Uint32 *pixels, vector p0, vector p1, struct color c)
+void draw_rect(Uint32 *pixels, vector p0, vector p1, SDL_Color c)
 {
 	p0.x = clamp(p0.x, 0, SCREEN_WIDTH);
 	p0.y = clamp(p0.y, 0, SCREEN_HEIGHT);
@@ -19,7 +113,13 @@ void draw_rect(Uint32 *pixels, vector p0, vector p1, struct color c)
 
 	for (int y = p0.y; y < p1.y; y++) {
 		for (int x = p0.x; x < p1.x; x++) {
-			draw_pixel(pixels, y * SCREEN_WIDTH + x, c);
+			draw_pixel(pixels, x, y, c);
 		}
 	}
+}
+
+void draw_quad(Uint32 *pixels, vector p1, vector p2, vector p3, vector p4, SDL_Color c)
+{
+	draw_triangle(pixels, p1, p2, p4, c);
+	draw_triangle(pixels, p2, p3, p4, c);
 }

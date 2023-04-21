@@ -84,7 +84,7 @@ bool inside(sector_idx_t idx, vector point)
 
 		double min_x = wall.a.x < wall.b.x ? wall.a.x : wall.b.x;
 		vector crossed = line_line_intersection(
-			wall, Line(Vector(min_x - 1, point.y), point));
+			wall, Linev(Vector(min_x - 1, point.y), point));
 
 		if (VectorIsValid(crossed)) {
 			if (wall.a.y < point.y || wall.b.y < point.y) {
