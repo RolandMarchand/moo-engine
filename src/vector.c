@@ -37,6 +37,11 @@ vector vector_mul(vector a, double scalar)
 	return Vector(a.x * scalar, a.y * scalar);
 }
 
+vector vector_div(vector a, double scalar)
+{
+	return Vector(a.x / scalar, a.y / scalar);
+}
+
 double vector_dot(vector a, vector b)
 {
 	return a.x * b.x + a.y * b.y;
@@ -47,32 +52,36 @@ double vector_cross(vector a, vector b)
 	return a.x * b.y - a.y * b.x;
 }
 
-double vector_magnitude(vector a)
+double vector_length(vector a)
 {
 	return sqrt(a.x * a.x + a.y * a.y);
 }
 
-vector vector_normalize(vector a)
+double vector_angle_to(vector from, vector to)
 {
-	double magnitude = vector_magnitude(a);
-	return Vector(a.x / magnitude, a.y / magnitude);
+	return atan2(vector_cross(from, to), vector_dot(from, to));
 }
 
-double vector_projection(line l, vector p)
+vector vector_projection(vector a, vector b)
 {
-	vector v1 = vector_sub(l.b, l.a);
-	vector v2 = vector_sub(p, l.a);
-	return vector_cross(v1, v2);
+	return vector_mul(a, vector_dot(a, b) / pow(vector_length(b), 2));
+}
+
+vector vector_normalize(vector a) {
+	double length = vector_length(a);
+	return Vector(a.x / length, a.y / length);
 }
 
 vector vector_rotate(vector v, double angle_rad)
 {
-	return Vector(v.x * cos(angle_rad) - v.y * sin(angle_rad),
-		      v.x * sin(angle_rad) + v.y * cos(angle_rad));
+	double sine = sin(angle_rad);
+	double cosi = cos(angle_rad);
+	return Vector(v.x * cosi - v.y * sine,
+		      v.x * sine + v.y * cosi);
 }
 
 vector vector_rotate_degrees(vector v, double angle_deg)
 {
-    double angle_rad = angle_deg * M_PI / 180.0;
-    return vector_rotate(v, angle_rad);
+	double angle_rad = angle_deg * M_PI / 180.0;
+	return vector_rotate(v, angle_rad);
 }
