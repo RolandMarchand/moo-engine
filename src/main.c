@@ -5,6 +5,8 @@
 #include "u_math.h"
 #include "draw.h"
 
+#define PLAYER_SPEED 100
+
 struct {
 	SDL_Window *window;
 	SDL_Surface *render;
@@ -18,10 +20,16 @@ struct {
 	bool show_fps;
 } context;
 
+struct {
+	double angle;
+	vector position;
+	vector velocity;
+} player;
 
 int engine_init(void);
-void engine_quit();
+void engine_quit(void);
 void engine_input(void);
+void engine_physics(void);
 void engine_update(void);
 void engine_render(void);
 
@@ -94,20 +102,42 @@ void engine_input()
 	SDL_PollEvent(&context.event);
 	switch (context.event.type) {
 	case SDL_KEYDOWN:
-		if (context.event.key.repeat == 1) {
-			break;
-		}
 		if (context.event.key.keysym.sym == SDLK_F1
 		    && SDL_GetModState() & KMOD_LALT) {
-			context.show_fps = !context.show_fps;
+			if (context.event.key.repeat == 1) {
+				break;
+			}
 		}
+		if (context.event.key.keysym.sym == SDLK_a) {
+			player.velocity =
+				vector_add(player.velocity, Vector(-1, 0));
+		}
+		if (context.event.key.keysym.sym == SDLK_s) {
+			player.velocity =
+				vector_add(player.velocity, Vector(0, 1));
+		}
+		if (context.event.key.keysym.sym == SDLK_w) {
+			player.velocity =
+				vector_add(player.velocity, Vector(0, -1));
+		}
+		if (context.event.key.keysym.sym == SDLK_d) {
+			player.velocity =
+				vector_add(player.velocity, Vector(1, 0));
+		}
+		player.velocity = vector_normalize(player.velocity);
+		player.velocity = vector_mul(player.velocity,
+					     context.delta * PLAYER_SPEED);
 		break;
 	default:
 		break;
 	}
 }
 
-void engine_quit()
+void engine_physics(void)
+{
+}
+
+void engine_quit(void)
 {
 	SDL_FreeSurface(context.render);
 	SDL_DestroyWindow(context.window);
@@ -153,7 +183,7 @@ int main(void)
 
 int screen_angle_to_x(double a)
 {
-	double a_pi4 = (FOV / 2.0 + a) / FOV * PI * 2.0 + (PI * 4.0);
+	double a_pi4 = (FOV / 2.0 + a) / FOV * M_PI * 2.0 + (M_PI * 4.0);
 	return SCREEN_WIDTH / 2.0 * (1.0 - tan(a_pi4));
 }
 
