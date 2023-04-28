@@ -6,5 +6,11 @@ include_directories(${SDL2_TTF_INCLUDE_DIRS})
 add_library(structures vector.c level.c)
 target_link_libraries(structures PUBLIC m)
 
-add_executable(${PROJECT_NAME} main.c draw.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARY} structures)
+add_library(graphics draw.c render.c)
+target_link_libraries(graphics PUBLIC structures)
+
+add_library(engine engine.c)
+target_link_libraries(engine PUBLIC graphics)
+
+add_executable(${PROJECT_NAME} main.c)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARY} engine)

@@ -83,7 +83,7 @@ bool inside(sector_idx_t idx, vector point)
 		line wall = Walls[s.wall_start + i].line;
 
 		double min_x = wall.a.x < wall.b.x ? wall.a.x : wall.b.x;
-		vector crossed = line_line_intersection(
+		vector crossed = lines_intersect_point(
 			wall, Linev(Vector(min_x - 1, point.y), point));
 
 		if (VectorIsValid(crossed)) {
