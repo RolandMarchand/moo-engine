@@ -15,16 +15,16 @@ void test_inside(void)
 {
 	struct wall walls[] = {
 		/* hexagon room */
-		{Line(Vector(64, 128), Vector(128, 0)), INVALID_SECTOR},
-		{Line(Vector(128, 0), Vector(64, -128)), INVALID_SECTOR},
-		{Line(Vector(64, -128), Vector(-64, -128)), INVALID_SECTOR},
-		{Line(Vector(-64, -128), Vector(-128, 0)), INVALID_SECTOR},
-		{Line(Vector(-128, 0), Vector(-64, 128)), INVALID_SECTOR},
-		{Line(Vector(-64, 128), Vector(64, 128)), INVALID_SECTOR},
+		{Linev(Vector(64, 128), Vector(128, 0)), INVALID_SECTOR},
+		{Linev(Vector(128, 0), Vector(64, -128)), INVALID_SECTOR},
+		{Linev(Vector(64, -128), Vector(-64, -128)), INVALID_SECTOR},
+		{Linev(Vector(-64, -128), Vector(-128, 0)), INVALID_SECTOR},
+		{Linev(Vector(-128, 0), Vector(-64, 128)), INVALID_SECTOR},
+		{Linev(Vector(-64, 128), Vector(64, 128)), INVALID_SECTOR},
 		/* triangle room */
-		{Line(Vector(0, 64), Vector(64, 0)), INVALID_SECTOR},
-		{Line(Vector(64, 0), Vector(-64, 0)), INVALID_SECTOR},
-		{Line(Vector(-64, 0), Vector(0, 64)), -1}
+		{Linev(Vector(0, 64), Vector(64, 0)), INVALID_SECTOR},
+		{Linev(Vector(64, 0), Vector(-64, 0)), INVALID_SECTOR},
+		{Linev(Vector(-64, 0), Vector(0, 64)), -1}
 	};
 	struct sector two_rooms[] = {
 		{0, 6}, /* hexagon */
@@ -61,25 +61,25 @@ void test_update_sector(void)
 */
 	struct wall walls[] = {
 		/* 0 */
-		{Line(Vector(0, 0), Vector(64, 0)), INVALID_SECTOR},
-		{Line(Vector(64, 0), Vector(64, -64)), 1},
-		{Line(Vector(64, -64), Vector(0, -64)), 3},
-		{Line(Vector(0, -64), Vector(0, 0)), INVALID_SECTOR},
+		{Linev(Vector(0, 0), Vector(64, 0)), INVALID_SECTOR},
+		{Linev(Vector(64, 0), Vector(64, -64)), 1},
+		{Linev(Vector(64, -64), Vector(0, -64)), 3},
+		{Linev(Vector(0, -64), Vector(0, 0)), INVALID_SECTOR},
 		/* 1 */
-		{Line(Vector(64, 0), Vector(128, 0)), INVALID_SECTOR},
-		{Line(Vector(128, 0), Vector(128, -64)), INVALID_SECTOR},
-		{Line(Vector(128, -64), Vector(64, -64)), 2},
-		{Line(Vector(64, -64), Vector(64, 0)), 0},
+		{Linev(Vector(64, 0), Vector(128, 0)), INVALID_SECTOR},
+		{Linev(Vector(128, 0), Vector(128, -64)), INVALID_SECTOR},
+		{Linev(Vector(128, -64), Vector(64, -64)), 2},
+		{Linev(Vector(64, -64), Vector(64, 0)), 0},
 		/* 2 */
-		{Line(Vector(64, -64), Vector(128, -64)), 1},
-		{Line(Vector(128, -64), Vector(128, -128)), INVALID_SECTOR},
-		{Line(Vector(128, -128), Vector(64, -128)), INVALID_SECTOR},
-		{Line(Vector(64, -128), Vector(64, -64)), 3},
+		{Linev(Vector(64, -64), Vector(128, -64)), 1},
+		{Linev(Vector(128, -64), Vector(128, -128)), INVALID_SECTOR},
+		{Linev(Vector(128, -128), Vector(64, -128)), INVALID_SECTOR},
+		{Linev(Vector(64, -128), Vector(64, -64)), 3},
 		/* 3 */
-		{Line(Vector(0, -64), Vector(64, -64)), 0},
-		{Line(Vector(64, -64), Vector(64, -128)), 2},
-		{Line(Vector(64, -128), Vector(0, -128)), INVALID_SECTOR},
-		{Line(Vector(0, -128), Vector(0, -64)), INVALID_SECTOR},
+		{Linev(Vector(0, -64), Vector(64, -64)), 0},
+		{Linev(Vector(64, -64), Vector(64, -128)), 2},
+		{Linev(Vector(64, -128), Vector(0, -128)), INVALID_SECTOR},
+		{Linev(Vector(0, -128), Vector(0, -64)), INVALID_SECTOR},
 	};
 	struct sector sectors[] = {
 		{0, 4},
