@@ -137,7 +137,7 @@ void engine_render(void)
 	/* draw_view(Context.render->pixels, */
 	/* 	  Color(100, 100, 100), */
 	/* 	  Color(255, 255, 255)); */
-	animate_rainbow(Context.render->pixels);
+	animate_rainbow(Context.render->pixels, Context.delta);
 	SDL_UnlockSurface(Context.render);
 	SDL_BlitSurface(Context.render, NULL,
 			SDL_GetWindowSurface(Context.window), NULL);

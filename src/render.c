@@ -1,5 +1,8 @@
 #include "render.h"
 
+static line get_frustum_left(double furthest_x);
+static line get_frustum_right(double furthest_x);
+
 void draw_view(Uint32 *pixels, color fg)
 {
 	Player.camera = VECTOR_DOWN;
@@ -25,7 +28,20 @@ line wall_to_local(line wall)
 	return wall;
 }
 
-/*  */
+static line get_frustum_left(double furthest_x)
+{
+	return Linev(VECTOR_ZERO,
+		     vector_from_polar(fabs(furthest_x) * M_SQRT2,
+				       deg2rad(90 + (FOV / 2))));
+}
+
+static line get_frustum_right(double furthest_x)
+{
+	return Linev(VECTOR_ZERO,
+		     vector_from_polar(fabs(furthest_x) * M_SQRT2,
+				       deg2rad(90 - (FOV / 2))));
+}
+
 line clip_wall(line wall)
 {
 	/* Backside */
@@ -52,33 +68,33 @@ line clip_wall(line wall)
 		if (angle2 < deg2rad(-FOV / 2)) {
 			return LINE_INVALID;
 		}
-		line angle_line_a = Linev(VECTOR_ZERO, vector_from_polar(-wall.a.x * M_SQRT2, deg2rad(-FOV / 2 - 90)));
-		wall.a = lines_intersect_point(wall, angle_line_a);
+		line frustum_left = get_frustum_left(wall.a.x);
+		wall.a = lines_intersect_at(wall, frustum_left);
 		if (angle2 > deg2rad(FOV / 2)) {
-			line angle_line_b = Linev(VECTOR_ZERO, vector_from_polar(wall.b.x * M_SQRT2, deg2rad(FOV / 2 - 90)));
-			wall.b = lines_intersect_point(wall, angle_line_b);
+			line frustum_right = get_frustum_right(wall.b.x);
+			wall.b = lines_intersect_at(wall, frustum_right);
 		}
 	} else if (angle1 > deg2rad(FOV / 2)) {
 		if (angle2 > deg2rad(FOV / 2)) {
 			return LINE_INVALID;
 		}
-		line angle_line_a = Linev(VECTOR_ZERO, vector_from_polar(wall.a.x * M_SQRT2, deg2rad(FOV / 2 - 90)));
-		wall.a = lines_intersect_point(wall, angle_line_a);
+		line frustum_left = get_frustum_left(wall.a.x);
+		wall.a = lines_intersect_at(wall, frustum_left);
 	} else if (angle2 < deg2rad(-FOV / 2)) {
-		line angle_line_b = Linev(VECTOR_ZERO, vector_from_polar(-wall.b.x * M_SQRT2, deg2rad(-FOV / 2 - 90)));
-		wall.b = lines_intersect_point(wall, angle_line_b);
+		line frustum_right = get_frustum_right(wall.b.x);
+		wall.b = lines_intersect_at(wall, frustum_right);
 	} else if (angle2 > deg2rad(FOV / 2)) {
-		line angle_line_b = Linev(VECTOR_ZERO, Vector(wall.b.x * M_SQRT2, deg2rad(FOV / 2 - 90)));
-		wall.b = lines_intersect_point(wall, angle_line_b);
+		line frustum_right = get_frustum_right(wall.b.x);
+		wall.b = lines_intersect_at(wall, frustum_right);
 	}
 	return wall;
 }
 
-void animate_rainbow(Uint32 *pixels)
+void animate_rainbow(Uint32 *pixels, double delta)
 {
 #define ANIMATION_SPEED 0.1
 	static double forward = 0;
-	forward += Context.delta * ANIMATION_SPEED;
+	forward += delta * ANIMATION_SPEED;
 	forward = fmod(forward, 1.0);
 	for (int h = 0; h < SCREEN_HEIGHT; h++) {
 		for (int w = 0; w < SCREEN_WIDTH; w++) {
