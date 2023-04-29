@@ -6,8 +6,8 @@
 
 #include "vector.h"
 
-#define PLAYER_WALK_SPEED (500.0)
-#define PLAYER_ROTATION_SPEED (20.0)
+#define PLAYER_WALK_SPEED (100.0)
+#define PLAYER_ROTATION_SPEED (2.0)
 #define FOV (90.0)
 
 extern struct context {

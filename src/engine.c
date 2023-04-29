@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "draw.h"
 #include "render.h"
+#include <SDL_scancode.h>
 
 struct context Context;
 struct player Player;
@@ -70,6 +71,37 @@ void engine_update(void)
 
 void engine_input(void)
 {
+	Uint8 *state = SDL_GetKeyboardState(NULL);
+	if (state[SDL_SCANCODE_A]) {
+		Player.velocity =
+			vector_add(Player.velocity,
+				   vector_rotate(Player.camera, M_PI / -2));
+	}
+	if (state[SDL_SCANCODE_S]) {
+		Player.velocity =
+			vector_add(Player.velocity,
+				   vector_mul(Player.camera, -1));
+	}
+	if (state[SDL_SCANCODE_W]) {
+		Player.velocity =
+			vector_add(Player.velocity, Player.camera);
+	}
+	if (state[SDL_SCANCODE_D]) {
+		Player.velocity =
+			vector_add(Player.velocity,
+				   vector_rotate(Player.camera, M_PI / 2));
+	}
+	if (state[SDL_SCANCODE_LEFT]) {
+		Player.camera = vector_rotate(
+			Player.camera,
+			Context.delta * -PLAYER_ROTATION_SPEED);
+	}
+	if (state[SDL_SCANCODE_RIGHT]) {
+		Player.camera = vector_rotate(
+			Player.camera,
+			Context.delta * PLAYER_ROTATION_SPEED);
+	}
+
 	SDL_PollEvent(&Context.event);
 	switch (Context.event.type) {
 	case SDL_KEYDOWN:
@@ -79,32 +111,6 @@ void engine_input(void)
 				break;
 			}
 		}
-		if (Context.event.key.keysym.sym == SDLK_a) {
-			Player.velocity =
-				vector_add(Player.velocity, Vector(-1, 0));
-		}
-		if (Context.event.key.keysym.sym == SDLK_s) {
-			Player.velocity =
-				vector_add(Player.velocity, Vector(0, 1));
-		}
-		if (Context.event.key.keysym.sym == SDLK_w) {
-			Player.velocity =
-				vector_add(Player.velocity, Vector(0, -1));
-		}
-		if (Context.event.key.keysym.sym == SDLK_d) {
-			Player.velocity =
-				vector_add(Player.velocity, Vector(1, 0));
-		}
-		if (Context.event.key.keysym.sym == SDLK_LEFT) {
-			Player.camera = vector_rotate(
-				Player.camera,
-				Context.delta * PLAYER_ROTATION_SPEED);
-		}
-		if (Context.event.key.keysym.sym == SDLK_RIGHT) {
-			Player.camera = vector_rotate(
-				Player.camera,
-				Context.delta * -PLAYER_ROTATION_SPEED);
-		}
 		break;
 	default:
 		break;
@@ -113,6 +119,7 @@ void engine_input(void)
 
 void engine_physics(void)
 {
+	Player.velocity = vector_normalize(Player.velocity);
 	Player.velocity = vector_mul(Player.velocity, PLAYER_WALK_SPEED * Context.delta);
 	Player.position = vector_add(Player.position, Player.velocity);
 	Player.velocity = Vector(0, 0);
