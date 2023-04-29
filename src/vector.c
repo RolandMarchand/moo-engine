@@ -68,7 +68,11 @@ vector vector_projection(vector a, vector b)
 }
 
 vector vector_normalize(vector a) {
-	double length = vector_length(a);
+	double length = a.x * a.x + a.y * a.y;
+	if (length == 0) {
+		return a;
+	}
+	length = sqrt(length);
 	return Vector(a.x / length, a.y / length);
 }
 
