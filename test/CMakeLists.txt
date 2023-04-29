@@ -2,6 +2,7 @@ include_directories("${CMAKE_SOURCE_DIR}/src")
 add_custom_target(tests DEPENDS
   test_vector
   test_level
+  test_wall_clip
 )
 add_custom_target(test_and_run COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS tests)
 
