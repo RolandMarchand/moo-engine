@@ -11,21 +11,13 @@ void draw_view(Uint32 *pixels, color fg)
 	wall = wall_to_local(wall);
 	wall = clip_wall(wall);
 	if (!LineIsValid(wall)) {return;}
-	double distance1 = vector_length(wall.a) + 1;
-	double distance2 = vector_length(wall.b) + 1;
-	double angle1 = rad2deg(vector_angle_to(wall.a, VECTOR_DOWN));
-	double angle2 = rad2deg(vector_angle_to(wall.b, VECTOR_DOWN));
-	angle1 = (angle1 + FOV / 2) / FOV * SCREEN_WIDTH;
-	angle2 = (angle2 + FOV / 2) / FOV * SCREEN_WIDTH;
-	double height1 = SCREEN_HEIGHT / distance1;
-	double height2 = SCREEN_HEIGHT / distance2;
-
-	draw_quad(pixels,
-		  Vector(angle1, (SCREEN_HEIGHT - height1) / 2),
-		  Vector(angle2, (SCREEN_HEIGHT - height2) / 2),
-		  Vector(angle2, (SCREEN_HEIGHT + height2) / 2),
-		  Vector(angle1, (SCREEN_HEIGHT + height1) / 2),
-		  fg);
+	double fov_scaling = tan(deg2rad(FOV) / 2.0) * SCREEN_WIDTH;
+	draw_wall(pixels,
+		Vector(wall.a.x / wall.a.y * fov_scaling, 1.0 / wall.a.y * fov_scaling),
+		Vector(wall.b.x / wall.b.y * fov_scaling, 1.0 / wall.b.y * fov_scaling),
+		Vector(wall.b.x / wall.b.y * fov_scaling, -1.0 / wall.b.y * fov_scaling),
+		Vector(wall.a.x / wall.a.y * fov_scaling, -1.0 / wall.a.y * fov_scaling),
+		fg);
 }
 
 line wall_to_local(line wall)
