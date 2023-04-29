@@ -41,6 +41,11 @@ int main()
 	clip = clip_wall(wall);
 	assert(!LineIsValid(clip));
 
+	/* Parallel to the player's view */
+	wall = Line(0, 10, 0, 100);
+	clip = clip_wall(wall);
+	assert(!LineIsValid(clip));
+
 	/* Partially clipped */
 	wall = Line(-20, 10, 0, 10);
 	clip = clip_wall(wall);

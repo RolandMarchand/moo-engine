@@ -45,7 +45,7 @@ static line get_frustum_right(double furthest_x)
 line clip_wall(line wall)
 {
 	/* Backside */
-	if (wall.a.x >= wall.b.x) {
+	if (vector_angle_to(wall.a, wall.b) >= 0) {
 		return LINE_INVALID;
 	}
 
