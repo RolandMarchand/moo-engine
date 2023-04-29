@@ -5,6 +5,22 @@
 static line get_frustum_left(double furthest_x);
 static line get_frustum_right(double furthest_x);
 
+void draw_map(Uint32 *pixels, color fg)
+{
+	line wall = Line(-5, 20, 5, 3);
+	wall.a = vector_sub(wall.a, Player.position);
+	wall.b = vector_sub(wall.b, Player.position);
+	draw_line(pixels, wall, fg);
+	vector arrow_origin = Vector(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+	vector new_cam = vector_mul(Player.camera, 20);
+	draw_line(pixels, Linev(arrow_origin, vector_add(arrow_origin, new_cam)),
+		  fg);
+	draw_rect(pixels,
+		  Vector(SCREEN_WIDTH / 2.0 - 10, SCREEN_HEIGHT / 2.0 - 10),
+		  Vector(SCREEN_WIDTH / 2.0 + 10, SCREEN_HEIGHT / 2.0 + 10),
+		  fg);
+}
+
 void draw_view(Uint32 *pixels, color fg)
 {
 	line wall = Line(-5, 20, 5, 3);

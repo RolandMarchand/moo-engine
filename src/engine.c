@@ -131,12 +131,13 @@ void engine_quit(void)
 void engine_render(void)
 {
 	SDL_LockSurface(Context.render);
-	/* draw_background(Context.render, Color(100, 100, 100)); */
+	draw_background(Context.render, Color(100, 100, 100));
 	/* draw_line(Context.render->pixels, Line(-10, -10, 1000, 800), Color(255, 255, 255)); */
 	/* draw_view(Context.render->pixels, */
 	/* 	  Color(100, 100, 100), */
 	/* 	  Color(255, 255, 255)); */
-	animate_rainbow(Context.render->pixels, Context.delta);
+	draw_map(Context.render->pixels, Color(255, 255, 255));
+	/* animate_rainbow(Context.render->pixels, Context.delta); */
 	SDL_UnlockSurface(Context.render);
 	SDL_BlitSurface(Context.render, NULL,
 			SDL_GetWindowSurface(Context.window), NULL);

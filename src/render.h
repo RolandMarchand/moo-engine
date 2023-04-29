@@ -5,6 +5,7 @@
 #define FOV (90.0)
 
 void draw_view(Uint32 *pixels, color);
+void draw_map(Uint32 *pixels, color fg);
 void engine_render(void);
 void animate_rainbow(Uint32 *pixels, double delta);
 /* Make wall local in relation to global variable Player */
