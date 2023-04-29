@@ -42,7 +42,8 @@ int engine_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	Player.camera = Vector(1, 0);
+	Player.camera = VECTOR_DOWN;
+	Player.position = VECTOR_ZERO;
 
 	return OK;
 }
@@ -104,8 +105,6 @@ void engine_input(void)
 				Player.camera,
 				Context.delta * -PLAYER_ROTATION_SPEED);
 		}
-		Player.velocity = vector_mul(Player.velocity,
-					     Context.delta * PLAYER_WALK_SPEED);
 		break;
 	default:
 		break;

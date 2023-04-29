@@ -9,14 +9,20 @@ void draw_view(Uint32 *pixels, color fg)
 {
 	line wall = Line(-5, 20, 5, 3);
 	wall = wall_to_local(wall);
-	wall = clip_wall(wall);
-	if (!LineIsValid(wall)) {return;}
+//	wall = clip_wall(wall);
+	if (!LineIsValid(wall)) {
+		return;
+	}
 	double fov_scaling = tan(deg2rad(FOV) / 2.0) * SCREEN_WIDTH;
 	draw_wall(pixels,
-		Vector(wall.a.x / wall.a.y * fov_scaling, 1.0 / wall.a.y * fov_scaling),
-		Vector(wall.b.x / wall.b.y * fov_scaling, 1.0 / wall.b.y * fov_scaling),
-		Vector(wall.b.x / wall.b.y * fov_scaling, -1.0 / wall.b.y * fov_scaling),
-		Vector(wall.a.x / wall.a.y * fov_scaling, -1.0 / wall.a.y * fov_scaling),
+		Vector(wall.a.x / wall.a.y * fov_scaling,
+		       1.0 / wall.a.y * fov_scaling),
+		Vector(wall.b.x / wall.b.y * fov_scaling,
+		       1.0 / wall.b.y * fov_scaling),
+		Vector(wall.b.x / wall.b.y * fov_scaling,
+		       -1.0 / wall.b.y * fov_scaling),
+		Vector(wall.a.x / wall.a.y * fov_scaling,
+		       -1.0 / wall.a.y * fov_scaling),
 		fg);
 }
 

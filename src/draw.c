@@ -119,20 +119,31 @@ void draw_rect(Uint32 *pixels, vector p0, vector p1, color c)
 	}
 }
 
-void draw_quad(Uint32 *pixels, vector p1, vector p2, vector p3, vector p4, color c)
+void draw_quad(Uint32 *pixels,
+	       vector top_left,
+	       vector top_right,
+	       vector bottom_right,
+	       vector bottom_left,
+	       color c)
 {
-	draw_triangle(pixels, p1, p2, p4, c);
-	draw_triangle(pixels, p2, p3, p4, c);
+	draw_triangle(pixels, top_left, top_right, bottom_left, c);
+	draw_triangle(pixels, top_right, bottom_right, bottom_left, c);
 }
 
-void draw_wall(Uint32 *pixels, vector p1, vector p2, vector p3, vector p4, color c)
+void draw_wall(Uint32 *pixels,
+	       vector top_left,
+	       vector top_right,
+	       vector bottom_right,
+	       vector bottom_left,
+	       color c)
 {
 	vector center_offset = Vector(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
-	p1 = vector_add(p1, center_offset);
-	p2 = vector_add(p2, center_offset);
-	p3 = vector_add(p3, center_offset);
-	p4 = vector_add(p4, center_offset);
-	draw_quad(pixels, p1, p2, p3, p4, c);
+	draw_quad(pixels,
+		  vector_add(top_left, center_offset),
+		  vector_add(top_right, center_offset),
+		  vector_add(bottom_right, center_offset),
+		  vector_add(bottom_left, center_offset),
+		  c);
 }
 
 void draw_background(SDL_Surface *surface, color c)
