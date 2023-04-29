@@ -125,6 +125,16 @@ void draw_quad(Uint32 *pixels, vector p1, vector p2, vector p3, vector p4, color
 	draw_triangle(pixels, p2, p3, p4, c);
 }
 
+void draw_wall(Uint32 *pixels, vector p1, vector p2, vector p3, vector p4, color c)
+{
+	vector center_offset = Vector(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+	p1 = vector_add(p1, center_offset);
+	p2 = vector_add(p2, center_offset);
+	p3 = vector_add(p3, center_offset);
+	p4 = vector_add(p4, center_offset);
+	draw_quad(pixels, p1, p2, p3, p4, c);
+}
+
 void draw_background(SDL_Surface *surface, color c)
 {
 	Uint32 bg_color = SDL_MapRGB(surface->format, c.r, c.g, c.b);
