@@ -1,21 +1,31 @@
 #include "render.h"
+#include "draw.h"
+#include "engine.h"
 
 static line get_frustum_left(double furthest_x);
 static line get_frustum_right(double furthest_x);
 
 void draw_view(Uint32 *pixels, color fg)
 {
-	Player.camera = VECTOR_DOWN;
-	Player.position = VECTOR_ZERO;
-	line wall = Line(-2000, 20, 2000, 40);
+	line wall = Line(-5, 20, 5, 3);
 	wall = wall_to_local(wall);
 	wall = clip_wall(wall);
-	assert(LineIsValid(wall));
+	if (!LineIsValid(wall)) {return;}
+	double distance1 = vector_length(wall.a) + 1;
+	double distance2 = vector_length(wall.b) + 1;
+	double angle1 = rad2deg(vector_angle_to(wall.a, VECTOR_DOWN));
+	double angle2 = rad2deg(vector_angle_to(wall.b, VECTOR_DOWN));
+	angle1 = (angle1 + FOV / 2) / FOV * SCREEN_WIDTH;
+	angle2 = (angle2 + FOV / 2) / FOV * SCREEN_WIDTH;
+	double height1 = SCREEN_HEIGHT / distance1;
+	double height2 = SCREEN_HEIGHT / distance2;
 
-	wall = Line(-20, -20, 20, -20);
-	wall = wall_to_local(wall);
-	wall = clip_wall(wall);
-	assert(!LineIsValid(wall));
+	draw_quad(pixels,
+		  Vector(angle1, (SCREEN_HEIGHT - height1) / 2),
+		  Vector(angle2, (SCREEN_HEIGHT - height2) / 2),
+		  Vector(angle2, (SCREEN_HEIGHT + height2) / 2),
+		  Vector(angle1, (SCREEN_HEIGHT + height1) / 2),
+		  fg);
 }
 
 line wall_to_local(line wall)

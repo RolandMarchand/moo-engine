@@ -6,7 +6,7 @@
 
 #include "vector.h"
 
-#define PLAYER_WALK_SPEED (1000.0)
+#define PLAYER_WALK_SPEED (500.0)
 #define PLAYER_ROTATION_SPEED (20.0)
 #define FOV (90.0)
 
