@@ -60,7 +60,7 @@ typedef struct {
 	};
 } line;
 
-vector lines_intersect_point(line, line);
+vector lines_intersect_at(line, line);
 vector vector_add(vector, vector);
 vector vector_sub(vector, vector);
 vector vector_mul(vector, double scalar);

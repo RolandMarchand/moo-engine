@@ -39,10 +39,10 @@ line clip_wall(line wall)
 			return LINE_INVALID;
 		}
 		line clip = Line(0, 0, wall.a.x, 0);
-		wall.a = lines_intersect_point(wall, clip);
+		wall.a = lines_intersect_at(wall, clip);
 	} else if (wall.b.y <= 0) {
 		line clip = Line(0, 0, wall.b.x, 0);
-		wall.b = lines_intersect_point(wall, clip);
+		wall.b = lines_intersect_at(wall, clip);
 	}
 
 	/* Clamp line at the FOV limits */

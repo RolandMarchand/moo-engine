@@ -1,6 +1,6 @@
 #include "vector.h"
 
-vector lines_intersect_point(line l1, line l2)
+vector lines_intersect_at(line l1, line l2)
 {
 	double x1 = l1.p1.x, x2 = l1.p2.x, x3 = l2.p1.x, x4 = l2.p2.x;
 	double y1 = l1.p1.y, y2 = l1.p2.y, y3 = l2.p1.y, y4 = l2.p2.y;
