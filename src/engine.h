@@ -10,6 +10,12 @@
 #define PLAYER_ROTATION_SPEED (2.0)
 #define FOV (90.0)
 
+struct config {
+	struct {
+		bool relative;
+	} map;
+};
+
 extern struct context {
 	SDL_Window *window;
 	SDL_Surface *render;
@@ -21,6 +27,8 @@ extern struct context {
 
 	Uint64 fps;
 	bool show_fps;
+
+	struct config config;
 } Context;
 
 extern struct player {

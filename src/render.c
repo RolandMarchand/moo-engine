@@ -4,21 +4,55 @@
 
 static line get_frustum_left(double furthest_x);
 static line get_frustum_right(double furthest_x);
+static void draw_absolute(Uint32 *pixels, color fg);
+static void draw_relative(Uint32 *pixels, color fg);
 
-void draw_map(Uint32 *pixels, color fg)
+static void draw_absolute(Uint32 *pixels, color fg)
 {
 	line wall = Line(-5, 20, 5, 3);
+	vector origin = Vector(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
 	wall.a = vector_sub(wall.a, Player.position);
 	wall.b = vector_sub(wall.b, Player.position);
+	wall.a = vector_add(wall.a, origin);
+	wall.b = vector_add(wall.b, origin);
 	draw_line(pixels, wall, fg);
-	vector arrow_origin = Vector(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
 	vector new_cam = vector_mul(Player.camera, 20);
-	draw_line(pixels, Linev(arrow_origin, vector_add(arrow_origin, new_cam)),
+	draw_line(pixels, Linev(origin, vector_add(origin, new_cam)),
 		  fg);
 	draw_rect(pixels,
 		  Vector(SCREEN_WIDTH / 2.0 - 10, SCREEN_HEIGHT / 2.0 - 10),
 		  Vector(SCREEN_WIDTH / 2.0 + 10, SCREEN_HEIGHT / 2.0 + 10),
 		  fg);
+}
+
+static void draw_relative(Uint32 *pixels, color fg)
+{
+	line wall = Line(-5, 20, 5, 3);
+	vector origin = Vector(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+	wall.a = vector_sub(wall.a, Player.position);
+	wall.b = vector_sub(wall.b, Player.position);
+	wall.a = vector_rotate(wall.a, vector_angle_to(Player.camera, VECTOR_UP));
+	wall.b = vector_rotate(wall.b, vector_angle_to(Player.camera, VECTOR_UP));
+	wall.a = vector_add(wall.a, origin);
+	wall.b = vector_add(wall.b, origin);
+	draw_line(pixels, wall, fg);
+	draw_line(pixels,
+		  Linev(origin, vector_add(origin, Vector(0, -20))),
+		  fg);
+	draw_rect(pixels,
+		  Vector(SCREEN_WIDTH / 2.0 - 10, SCREEN_HEIGHT / 2.0 - 10),
+		  Vector(SCREEN_WIDTH / 2.0 + 10, SCREEN_HEIGHT / 2.0 + 10),
+		  fg);
+}
+
+void draw_map(Uint32 *pixels, color fg)
+{
+	if (Context.config.map.relative) {
+		draw_relative(pixels, fg);
+	} else {
+		draw_absolute(pixels, fg);
+	}
+	
 }
 
 void draw_view(Uint32 *pixels, color fg)

@@ -3,6 +3,8 @@
 #include "render.h"
 #include <SDL_scancode.h>
 
+static struct config get_default_config();
+
 struct context Context;
 struct player Player;
 int engine_init(void)
@@ -46,6 +48,8 @@ int engine_init(void)
 	Player.camera = VECTOR_DOWN;
 	Player.position = VECTOR_ZERO;
 
+	Context.config = get_default_config();
+
 	return OK;
 }
 
@@ -71,7 +75,7 @@ void engine_update(void)
 
 void engine_input(void)
 {
-	Uint8 *state = SDL_GetKeyboardState(NULL);
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	if (state[SDL_SCANCODE_A]) {
 		Player.velocity =
 			vector_add(Player.velocity,
@@ -105,11 +109,20 @@ void engine_input(void)
 	SDL_PollEvent(&Context.event);
 	switch (Context.event.type) {
 	case SDL_KEYDOWN:
-		if (Context.event.key.keysym.sym == SDLK_F1
-		    && SDL_GetModState() & KMOD_LALT) {
-			if (Context.event.key.repeat == 1) {
-				break;
+		switch (Context.event.key.keysym.sym) {
+		case SDLK_F1:
+			if ((SDL_GetModState() & KMOD_LALT)
+			    && Context.event.key.repeat == 0) {
+				Context.show_fps = !Context.show_fps;
 			}
+			break;
+		case SDLK_TAB:
+			if (Context.event.key.repeat == 0) {
+				Context.config.map.relative = !Context.config.map.relative;
+			}
+			break;
+		default:
+			break;
 		}
 		break;
 	default:
@@ -160,4 +173,11 @@ void engine_render(void)
 	}
 
 	SDL_UpdateWindowSurface(Context.window);
+}
+
+struct config get_default_config()
+{
+	return (struct config){
+		.map.relative = false
+	};
 }
