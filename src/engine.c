@@ -3,8 +3,6 @@
 #include "render.h"
 #include <SDL_scancode.h>
 
-static struct config get_default_config();
-
 struct context Context;
 struct player Player;
 int engine_init(void)
@@ -48,7 +46,10 @@ int engine_init(void)
 	Player.camera = VECTOR_DOWN;
 	Player.position = VECTOR_ZERO;
 
-	Context.config = get_default_config();
+	Context.config = (struct config) {
+		.map = 1,
+		.view = 0,
+	};
 
 	return OK;
 }
@@ -109,17 +110,22 @@ void engine_input(void)
 	SDL_PollEvent(&Context.event);
 	switch (Context.event.type) {
 	case SDL_KEYDOWN:
+		if (Context.event.key.repeat != 0) {
+			return;
+		}
 		switch (Context.event.key.keysym.sym) {
 		case SDLK_F1:
-			if ((SDL_GetModState() & KMOD_LALT)
-			    && Context.event.key.repeat == 0) {
+			if ((SDL_GetModState() & KMOD_LALT)) {
 				Context.show_fps = !Context.show_fps;
 			}
 			break;
 		case SDLK_TAB:
-			if (Context.event.key.repeat == 0) {
-				Context.config.map.relative = !Context.config.map.relative;
-			}
+			Context.config.map %= 2;
+			Context.config.map += 1;
+			break;
+		case SDLK_SPACE:
+			Context.config.view %= 2;
+			Context.config.view += 1;
 			break;
 		default:
 			break;
@@ -151,13 +157,15 @@ void engine_quit(void)
 void engine_render(void)
 {
 	SDL_LockSurface(Context.render);
-	draw_background(Context.render, Color(100, 100, 100));
-	/* draw_line(Context.render->pixels, Line(-10, -10, 1000, 800), Color(255, 255, 255)); */
-	/* draw_view(Context.render->pixels, */
-	/* 	  Color(100, 100, 100), */
-	/* 	  Color(255, 255, 255)); */
-	draw_map(Context.render->pixels, Color(255, 255, 255));
-	/* animate_rainbow(Context.render->pixels, Context.delta); */
+	if (Context.config.view == CONFIG_VIEW_3D) {
+		draw_background(Context.render, Color(100, 100, 100));
+		draw_view(Context.render->pixels, Color(100, 100, 100));
+	} else if (Context.config.view == CONFIG_VIEW_MAP) {
+		draw_background(Context.render, Color(100, 100, 100));
+		draw_map(Context.render->pixels, Color(255, 255, 255));
+	} else {
+		animate_rainbow(Context.render->pixels, Context.delta);
+	}
 	SDL_UnlockSurface(Context.render);
 	SDL_BlitSurface(Context.render, NULL,
 			SDL_GetWindowSurface(Context.window), NULL);
@@ -173,11 +181,4 @@ void engine_render(void)
 	}
 
 	SDL_UpdateWindowSurface(Context.window);
-}
-
-struct config get_default_config()
-{
-	return (struct config){
-		.map.relative = false
-	};
 }

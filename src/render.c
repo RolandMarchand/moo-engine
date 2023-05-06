@@ -47,7 +47,7 @@ static void draw_relative(Uint32 *pixels, color fg)
 
 void draw_map(Uint32 *pixels, color fg)
 {
-	if (Context.config.map.relative) {
+	if (Context.config.map == CONFIG_MAP_RELATIVE) {
 		draw_relative(pixels, fg);
 	} else {
 		draw_absolute(pixels, fg);
@@ -63,17 +63,12 @@ void draw_view(Uint32 *pixels, color fg)
 	if (!LineIsValid(wall)) {
 		return;
 	}
-	double fov_scaling = tan(deg2rad(FOV) / 2.0) * SCREEN_WIDTH;
-	draw_wall(pixels,
-		Vector(wall.a.x / wall.a.y * fov_scaling,
-		       1.0 / wall.a.y * fov_scaling),
-		Vector(wall.b.x / wall.b.y * fov_scaling,
-		       1.0 / wall.b.y * fov_scaling),
-		Vector(wall.b.x / wall.b.y * fov_scaling,
-		       -1.0 / wall.b.y * fov_scaling),
-		Vector(wall.a.x / wall.a.y * fov_scaling,
-		       -1.0 / wall.a.y * fov_scaling),
-		fg);
+	vector euclidean_a = vector_sub(wall.a, Player.position);
+	double angle_a = fabs(vector_angle_to(euclidean_a, Player.camera));
+	double distance_a = sin(angle_a);
+
+	vector euclidean_b = vector_sub(wall.b, Player.position);
+	
 }
 
 line wall_to_local(line wall)

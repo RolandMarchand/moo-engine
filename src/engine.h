@@ -10,10 +10,21 @@
 #define PLAYER_ROTATION_SPEED (2.0)
 #define FOV (90.0)
 
+/* First element in config enums is default */
+
+typedef enum {
+	CONFIG_MAP_ABSOLUTE = 1,
+	CONFIG_MAP_RELATIVE = 2,
+} ConfigMap;
+
+typedef enum {
+	CONFIG_VIEW_MAP = 1,
+	CONFIG_VIEW_3D = 2,
+} ConfigView;
+
 struct config {
-	struct {
-		bool relative;
-	} map;
+	ConfigMap map;
+	ConfigView view;
 };
 
 extern struct context {
