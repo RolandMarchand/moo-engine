@@ -150,15 +150,14 @@ line clip_wall(line wall)
 
 void animate_rainbow(Uint32 *pixels, double delta)
 {
-#define ANIMATION_SPEED 0.1
+#define ANIMATION_SPEED 100
 	static double forward = 0;
-	forward += delta * ANIMATION_SPEED;
-	forward = fmod(forward, 1.0);
-	for (int h = 0; h < SCREEN_HEIGHT; h++) {
-		for (int w = 0; w < SCREEN_WIDTH; w++) {
-			double t = w * 1.0 / SCREEN_WIDTH;
-			t += forward;
-			t = fmod(fabs(t), 1.0);
+	static color row[SCREEN_WIDTH * 2];
+	static bool row_set;
+	if (!row_set) {
+		row_set = true;
+		for (int i = 0; i < SCREEN_WIDTH; i++) {
+			double t = i * 1.0 / SCREEN_WIDTH;
 			double hue = 360.0 * t;
 			double x = 1.0 - fabs(fmod((hue/60.0), 2.0) - 1.0);
 			double r1, g1, b1;
@@ -187,9 +186,18 @@ void animate_rainbow(Uint32 *pixels, double delta)
 				g1 = 0.0;
 				b1 = x;
 			}
-			color c = {r1 * 255, g1 * 255, b1 * 255, 255};
-			draw_pixel(pixels, w, h, c);
-		} 
+			row[i] = Color(r1 * 255, g1 * 255, b1 * 255);
+		}
+		for (int i = 0; i < SCREEN_WIDTH; i++) {
+			row[i + SCREEN_WIDTH] = row[i];
+		}
 	}
+	for (int h = 0; h < SCREEN_HEIGHT; h++) {
+		for (int w = 0; w < SCREEN_WIDTH; w++) {
+			draw_pixel(pixels, w, h, row[(h + w + (int)(forward)) %  SCREEN_WIDTH * 2]);
+		}
+	}
+	forward += delta * ANIMATION_SPEED;
+	forward = fmod(forward, SCREEN_WIDTH);
 #undef ANIMATION_SPEED
 }
